@@ -27,8 +27,8 @@ The application follows a modern full-stack architecture with clear separation b
 ### Backend Architecture
 - **Express Server**: RESTful API with middleware for logging and error handling
 - **Database Layer**: Drizzle ORM with PostgreSQL for type-safe database operations
-- **AI Services**: OpenAI integration for story generation and DALL-E for illustrations
-- **Storage Interface**: Abstracted storage layer with in-memory fallback for development
+- **AI Services**: Google Gemini integration for story generation and illustrations
+- **Storage Interface**: PostgreSQL database with automatic seeding and character suggestion tracking
 
 ### Database Schema
 Three main tables:
@@ -80,6 +80,10 @@ The build process creates a `dist` directory with both client assets and server 
 ```
 Changelog:
 - June 27, 2025. Initial setup
+- June 27, 2025. Added PostgreSQL database integration with Drizzle ORM
+- June 27, 2025. Migrated from in-memory storage to persistent database storage
+- June 27, 2025. Updated from OpenAI to Google Gemini API integration
+- June 27, 2025. Added automatic database seeding with character suggestions
 ```
 
 ## User Preferences

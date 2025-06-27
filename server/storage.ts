@@ -1,4 +1,6 @@
 import { stories, userPreferences, characterSuggestions, type Story, type InsertStory, type UserPreferences, type InsertUserPreferences, type CharacterSuggestion, type InsertCharacterSuggestion } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // Stories
@@ -142,4 +144,86 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database Storage implementation
+export class DatabaseStorage implements IStorage {
+  async getStory(id: number): Promise<Story | undefined> {
+    const [story] = await db.select().from(stories).where(eq(stories.id, id));
+    return story || undefined;
+  }
+
+  async getAllStories(): Promise<Story[]> {
+    return await db.select().from(stories).orderBy(stories.id);
+  }
+
+  async createStory(insertStory: InsertStory): Promise<Story> {
+    const [story] = await db
+      .insert(stories)
+      .values(insertStory)
+      .returning();
+    return story;
+  }
+
+  async deleteStory(id: number): Promise<boolean> {
+    const result = await db.delete(stories).where(eq(stories.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getUserPreferences(): Promise<UserPreferences | undefined> {
+    const [prefs] = await db.select().from(userPreferences).limit(1);
+    return prefs || undefined;
+  }
+
+  async updateUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences> {
+    // Check if preferences exist
+    const existing = await this.getUserPreferences();
+    
+    if (existing) {
+      const [updated] = await db
+        .update(userPreferences)
+        .set(preferences)
+        .where(eq(userPreferences.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(userPreferences)
+        .values(preferences)
+        .returning();
+      return created;
+    }
+  }
+
+  async getCharacterSuggestions(): Promise<CharacterSuggestion[]> {
+    return await db
+      .select()
+      .from(characterSuggestions)
+      .orderBy(characterSuggestions.usageCount);
+  }
+
+  async addCharacterSuggestion(character: InsertCharacterSuggestion): Promise<CharacterSuggestion> {
+    const [suggestion] = await db
+      .insert(characterSuggestions)
+      .values(character)
+      .returning();
+    return suggestion;
+  }
+
+  async incrementCharacterUsage(character: string): Promise<void> {
+    const existing = await db
+      .select()
+      .from(characterSuggestions)
+      .where(eq(characterSuggestions.character, character))
+      .limit(1);
+
+    if (existing.length > 0) {
+      await db
+        .update(characterSuggestions)
+        .set({ usageCount: (existing[0].usageCount ?? 0) + 1 })
+        .where(eq(characterSuggestions.id, existing[0].id));
+    } else {
+      await this.addCharacterSuggestion({ character, usageCount: 1 });
+    }
+  }
+}
+
+export const storage = new DatabaseStorage();
