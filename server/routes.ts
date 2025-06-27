@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { storyGenerationSchema } from "@shared/schema";
-import { generateBedtimeStory, generateBedtimeIllustration, suggestCharacters } from "./services/openai";
+import { generateBedtimeStory, generateBedtimeIllustration, suggestCharacters } from "./services/gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all stories

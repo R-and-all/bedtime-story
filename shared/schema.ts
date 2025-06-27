@@ -9,7 +9,7 @@ export const stories = pgTable("stories", {
   characters: text("characters").array().notNull(),
   setting: text("setting").notNull(),
   age: integer("age").notNull(),
-  storyLength: integer("story_length").notNull(), // 5 or 10 minutes
+  storyLength: text("story_length").notNull(), // "5min" or "10min"
   moralTheme: text("moral_theme"),
   illustrationUrl: text("illustration_url"),
   curriculumStage: text("curriculum_stage").notNull(),
@@ -58,7 +58,7 @@ export const storyGenerationSchema = z.object({
   characters: z.array(z.string()).min(3).max(5),
   setting: z.string().min(10),
   age: z.number().min(0).max(12),
-  storyLength: z.number().refine(val => val === 5 || val === 10),
+  storyLength: z.union([z.literal("5min"), z.literal("10min")]),
   moralTheme: z.string().optional(),
 });
 

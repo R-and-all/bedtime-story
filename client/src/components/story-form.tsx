@@ -50,7 +50,7 @@ export function StoryForm({ onStoryGenerated }: StoryFormProps) {
       characters: validCharacters,
       setting: setting.trim(),
       age,
-      storyLength: storyLength as 5 | 10,
+      storyLength: storyLength === 5 ? "5min" : "10min",
       moralTheme: moralTheme === 'auto' ? undefined : moralTheme || undefined,
     };
 
