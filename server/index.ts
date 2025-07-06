@@ -38,8 +38,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Seed database on startup
-  await seedDatabase();
+  // Database seeding commented out for now - using in-memory storage
+  // await seedDatabase();
 
   const server = await registerRoutes(app);
 
